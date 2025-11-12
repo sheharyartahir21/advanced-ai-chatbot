@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus AI - Advanced Customer Support</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a0f1a 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #ffffff;
+            padding: 15px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 450px;
+            height: 90vh;
+            max-height: 800px;
+            background: #1a1a1a;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #333;
+            position: relative;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .chat-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .chat-header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 25px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            background: rgba(255,255,255,0.1);
+            padding: 5px 10px;
+            border-radius: 15px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: #1a1a1a;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 15px 18px;
+            border-radius: 18px;
+            line-height: 1.5;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            animation: messageSlide 0.3s ease-out;
+        }
+
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.assistant {
+            align-self: flex-start;
+            background: #2a2a2a;
+            color: #f0f0f0;
+            border: 1px solid #3a3a3a;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 8px;
+            text-align: right;
+        }
+
+        .assistant-name {
+            font-weight: 600;
+            color: #8a63d2;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 20px;
+            margin: 10px 0;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+            font-size: 0.95rem;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            border-top: 1px solid #333;
+            display: flex;
+            gap: 12px;
+            background: #1f1f1f;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 1px solid #444;
+            border-radius: 25px;
+            outline: none;
+            font-size: 1rem;
+            background: #2a2a2a;
+            color: #ffffff;
+            transition: all 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .chat-input::placeholder {
+            color: #888;
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .quick-reply {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid #667eea;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #667eea;
+        }
+
+        .quick-reply:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 10px 0;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #667eea;
+            animation: typingAnimation 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingAnimation {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 3px;
+        }
+
+        .model-info {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-top: 5px;
+        }
+
+        .developer-badge {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>Nexus AI</h1>
+            <p>Advanced Customer Support</p>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>AI Powered</span>
+            </div>
+        </div>
+        
+        <div class="chat-messages">
+            <div class="welcome-message">
+                <p>👋 Hello! I'm Nexus AI, your advanced customer support assistant powered by artificial intelligence. I can help with product inquiries, order support, technical issues, and much more. How can I assist you today?</p>
+            </div>
+        </div>
+        
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" placeholder="Ask me anything..." id="chatInput">
+            <button class="send-button" id="sendButton">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+
+        <div class="developer-badge">
+            🤖 Powered by OpenRouter AI • Professional Grade
+        </div>
+    </div>
+
+    <script type="module">
+        // OpenRouter API Configuration
+        const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
+        const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+
+        class AdvancedChatbot {
+            constructor() {
+                this.chatMessages = document.querySelector('.chat-messages');
+                this.chatInput = document.getElementById('chatInput');
+                this.sendButton = document.getElementById('sendButton');
+                this.conversationHistory = [];
+                
+                this.initializeEventListeners();
+                this.scrollToBottom();
+            }
+
+            initializeEventListeners() {
+                this.sendButton.addEventListener('click', () => this.sendMessage());
+                this.chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendMessage();
+                });
+            }
+
+            async sendMessage() {
+                const message = this.chatInput.value.trim();
+                if (!message) return;
+
+                this.addMessage(message, 'user');
+                this.chatInput.value = '';
+                this.setLoadingState(true);
+
+                try {
+                    const response = await this.getAIResponse(message);
+                    this.addMessage(response, 'assistant');
+                } catch (error) {
+                    console.error('AI Response Error:', error);
+                    this.addMessage('I apologize, but I encountered an issue processing your request. Please try again in a moment.', 'assistant');
+                } finally {
+                    this.setLoadingState(false);
+                }
+            }
+
+            async getAIResponse(userMessage) {
+                // Add to conversation history
+                this.conversationHistory.push({ role: 'user', content: userMessage });
+
+                const response = await axios.post(OPENROUTER_API_URL, {
+                    model: 'meta-llama/llama-3-8b-instruct:free',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: `You are Nexus AI, a professional customer support assistant for an e-commerce company. 
+                                    You are helpful, knowledgeable, and provide detailed, accurate responses.
+                                    Always maintain a professional yet friendly tone.
+                                    If you don't know something, be honest about it.
+                                    Keep responses concise but informative.`
+                        },
+                        ...this.conversationHistory
+                    ],
+                    max_tokens: 500,
+                    temperature: 0.7
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+                        'Content-Type': 'application/json',
+                        'HTTP-Referer': window.location.origin,
+                        'X-Title': 'Nexus AI Chatbot'
+                    }
+                });
+
+                const aiMessage = response.data.choices[0].message.content;
+                
+                // Add to conversation history
+                this.conversationHistory.push({ role: 'assistant', content: aiMessage });
+                
+                // Keep conversation history manageable
+                if (this.conversationHistory.length > 10) {
+                    this.conversationHistory = this.conversationHistory.slice(-10);
+                }
+
+                return aiMessage;
+            }
+
+            addMessage(content, sender) {
+                const messageElement = document.createElement('div');
+                messageElement.className = `message ${sender}`;
+                
+                const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                if (sender === 'assistant') {
+                    messageElement.innerHTML = `
+                        <div class="assistant-name">
+                            <i class="fas fa-robot"></i>
+                            Nexus AI
+                        </div>
+                        ${content}
+                        <div class="message-time">${timestamp}</div>
+                        <div class="model-info">Powered by Llama 3 • OpenRouter</div>
+                    `;
+                } else {
+                    messageElement.innerHTML = `
+                        ${content}
+                        <div class="message-time">${timestamp}</div>
+                    `;
+                }
+
+                this.chatMessages.appendChild(messageElement);
+                this.scrollToBottom();
+
+                // Add quick replies for first AI response
+                if (sender === 'assistant' && !document.querySelector('.quick-replies')) {
+                    this.addQuickReplies();
+                }
+            }
+
+            addQuickReplies() {
+                const quickReplies = document.createElement('div');
+                quickReplies.className = 'quick-replies';
+                quickReplies.innerHTML = `
+                    <div class="quick-reply" onclick="chatbot.quickReply('What are your shipping options?')">
+                        📦 Shipping Info
+                    </div>
+                    <div class="quick-reply" onclick="chatbot.quickReply('How do I track my order?')">
+                        🚚 Track Order
+                    </div>
+                    <div class="quick-reply" onclick="chatbot.quickReply('What is your return policy?')">
+                        🔄 Returns
+                    </div>
+                    <div class="quick-reply" onclick="chatbot.quickReply('Tell me about your premium products')">
+                        ⭐ Premium Products
+                    </div>
+                `;
+                
+                const lastMessage = this.chatMessages.lastElementChild;
+                if (lastMessage && lastMessage.classList.contains('assistant')) {
+                    lastMessage.appendChild(quickReplies);
+                }
+            }
+
+            quickReply(message) {
+                this.chatInput.value = message;
+                this.sendMessage();
+            }
+
+            setLoadingState(loading) {
+                this.sendButton.disabled = loading;
+                this.sendButton.innerHTML = loading ? 
+                    '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>' : 
+                    '<i class="fas fa-paper-plane"></i>';
+            }
+
+            scrollToBottom() {
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+        }
+
+        // Initialize chatbot
+        const chatbot = new AdvancedChatbot();
+    </script>
+</body>
+</html>
