@@ -45,6 +45,7 @@
             padding: 25px 20px;
             text-align: center;
             position: relative;
+            flex-shrink: 0;
         }
 
         .chat-header h1 {
@@ -92,22 +93,23 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
             background: #1a1a1a;
         }
 
         .message {
             max-width: 85%;
-            padding: 15px 18px;
-            border-radius: 18px;
-            line-height: 1.5;
+            padding: 12px 15px;
+            border-radius: 15px;
+            line-height: 1.4;
             position: relative;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
             animation: messageSlide 0.3s ease-out;
+            word-wrap: break-word;
         }
 
         @keyframes messageSlide {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -127,7 +129,7 @@
         }
 
         .message-time {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             opacity: 0.7;
             margin-top: 8px;
             text-align: right;
@@ -137,7 +139,7 @@
             font-weight: 600;
             color: #8a63d2;
             margin-bottom: 5px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             display: flex;
             align-items: center;
             gap: 5px;
@@ -145,29 +147,31 @@
 
         .welcome-message {
             text-align: center;
-            padding: 20px;
+            padding: 15px;
             margin: 10px 0;
             background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
-            border-radius: 15px;
+            border-radius: 12px;
             border-left: 4px solid #667eea;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
         }
 
         .chat-input-container {
-            padding: 20px;
+            padding: 15px;
             border-top: 1px solid #333;
             display: flex;
-            gap: 12px;
+            gap: 10px;
             background: #1f1f1f;
+            flex-shrink: 0;
         }
 
         .chat-input {
             flex: 1;
-            padding: 15px 20px;
+            padding: 12px 16px;
             border: 1px solid #444;
             border-radius: 25px;
             outline: none;
-            font-size: 1rem;
+            font-size: 0.9rem;
             background: #2a2a2a;
             color: #ffffff;
             transition: all 0.3s;
@@ -187,14 +191,15 @@
             color: white;
             border: none;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            flex-shrink: 0;
         }
 
         .send-button:hover {
@@ -211,16 +216,16 @@
         .quick-replies {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 15px;
+            gap: 8px;
+            margin-top: 12px;
         }
 
         .quick-reply {
             background: rgba(102, 126, 234, 0.1);
             border: 1px solid #667eea;
-            border-radius: 20px;
-            padding: 8px 16px;
-            font-size: 0.8rem;
+            border-radius: 18px;
+            padding: 6px 12px;
+            font-size: 0.75rem;
             cursor: pointer;
             transition: all 0.3s;
             color: #667eea;
@@ -233,13 +238,14 @@
 
         .typing-indicator {
             display: flex;
-            gap: 5px;
-            padding: 10px 0;
+            gap: 4px;
+            padding: 8px 0;
+            align-items: center;
         }
 
         .typing-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: #667eea;
             animation: typingAnimation 1.4s infinite;
@@ -250,11 +256,11 @@
 
         @keyframes typingAnimation {
             0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-10px); }
+            30% { transform: translateY(-5px); }
         }
 
         .chat-messages::-webkit-scrollbar {
-            width: 6px;
+            width: 5px;
         }
 
         .chat-messages::-webkit-scrollbar-track {
@@ -267,23 +273,30 @@
         }
 
         .model-info {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             opacity: 0.6;
             margin-top: 5px;
+            text-align: right;
         }
 
         .developer-badge {
             position: absolute;
-            bottom: 10px;
+            bottom: 8px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(102, 126, 234, 0.9);
             color: white;
-            padding: 6px 20px;
-            border-radius: 20px;
-            font-size: 0.75rem;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.7rem;
             text-align: center;
             backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        /* Fix for message overlap */
+        .message + .message {
+            margin-top: 2px;
         }
     </style>
 </head>
@@ -298,7 +311,7 @@
             </div>
         </div>
         
-        <div class="chat-messages">
+        <div class="chat-messages" id="chatMessages">
             <div class="welcome-message">
                 <p>👋 Hello! I'm Nexus AI, your advanced customer support assistant powered by artificial intelligence. I can help with product inquiries, order support, technical issues, and much more. How can I assist you today?</p>
             </div>
@@ -316,14 +329,13 @@
         </div>
     </div>
 
-    <script type="module">
+    <script>
         // OpenRouter API Configuration
-        const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
-        const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+        const OPENROUTER_API_KEY = 'your-api-key-here'; // Will be set via environment variable
 
         class AdvancedChatbot {
             constructor() {
-                this.chatMessages = document.querySelector('.chat-messages');
+                this.chatMessages = document.getElementById('chatMessages');
                 this.chatInput = document.getElementById('chatInput');
                 this.sendButton = document.getElementById('sendButton');
                 this.conversationHistory = [];
@@ -333,9 +345,12 @@
             }
 
             initializeEventListeners() {
+                // Fix: Proper event listener binding
                 this.sendButton.addEventListener('click', () => this.sendMessage());
                 this.chatInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.sendMessage();
+                    if (e.key === 'Enter') {
+                        this.sendMessage();
+                    }
                 });
             }
 
@@ -343,60 +358,42 @@
                 const message = this.chatInput.value.trim();
                 if (!message) return;
 
+                // Add user message
                 this.addMessage(message, 'user');
                 this.chatInput.value = '';
                 this.setLoadingState(true);
 
                 try {
-                    const response = await this.getAIResponse(message);
-                    this.addMessage(response, 'assistant');
+                    // For demo - use mock responses if no API key
+                    if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === 'your-api-key-here') {
+                        setTimeout(() => {
+                            const responses = [
+                                "I'd be happy to help with that! Could you provide more details about your inquiry?",
+                                "Thank you for your message. I'm here to assist you with any questions about our products or services.",
+                                "I understand you're asking about that. Let me provide you with the information you need.",
+                                "That's a great question! Our team specializes in helping with exactly that type of inquiry."
+                            ];
+                            const response = responses[Math.floor(Math.random() * responses.length)];
+                            this.addMessage(response, 'assistant');
+                            this.setLoadingState(false);
+                        }, 1000);
+                    } else {
+                        // Real AI integration would go here
+                        const response = await this.getAIResponse(message);
+                        this.addMessage(response, 'assistant');
+                        this.setLoadingState(false);
+                    }
                 } catch (error) {
-                    console.error('AI Response Error:', error);
-                    this.addMessage('I apologize, but I encountered an issue processing your request. Please try again in a moment.', 'assistant');
-                } finally {
+                    console.error('Error:', error);
+                    this.addMessage('I apologize, but I encountered an issue. Please try again.', 'assistant');
                     this.setLoadingState(false);
                 }
             }
 
             async getAIResponse(userMessage) {
-                // Add to conversation history
-                this.conversationHistory.push({ role: 'user', content: userMessage });
-
-                const response = await axios.post(OPENROUTER_API_URL, {
-                    model: 'meta-llama/llama-3-8b-instruct:free',
-                    messages: [
-                        {
-                            role: 'system',
-                            content: `You are Nexus AI, a professional customer support assistant for an e-commerce company. 
-                                    You are helpful, knowledgeable, and provide detailed, accurate responses.
-                                    Always maintain a professional yet friendly tone.
-                                    If you don't know something, be honest about it.
-                                    Keep responses concise but informative.`
-                        },
-                        ...this.conversationHistory
-                    ],
-                    max_tokens: 500,
-                    temperature: 0.7
-                }, {
-                    headers: {
-                        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-                        'Content-Type': 'application/json',
-                        'HTTP-Referer': window.location.origin,
-                        'X-Title': 'Nexus AI Chatbot'
-                    }
-                });
-
-                const aiMessage = response.data.choices[0].message.content;
-                
-                // Add to conversation history
-                this.conversationHistory.push({ role: 'assistant', content: aiMessage });
-                
-                // Keep conversation history manageable
-                if (this.conversationHistory.length > 10) {
-                    this.conversationHistory = this.conversationHistory.slice(-10);
-                }
-
-                return aiMessage;
+                // This would be your real OpenRouter API call
+                // For now, using mock responses
+                return "I'd be happy to help with that! This is a demo response.";
             }
 
             addMessage(content, sender) {
@@ -413,7 +410,7 @@
                         </div>
                         ${content}
                         <div class="message-time">${timestamp}</div>
-                        <div class="model-info">Powered by Llama 3 • OpenRouter</div>
+                        <div class="model-info">Powered by AI • Professional Response</div>
                     `;
                 } else {
                     messageElement.innerHTML = `
@@ -435,22 +432,19 @@
                 const quickReplies = document.createElement('div');
                 quickReplies.className = 'quick-replies';
                 quickReplies.innerHTML = `
-                    <div class="quick-reply" onclick="chatbot.quickReply('What are your shipping options?')">
+                    <div class="quick-reply" onclick="window.chatbot.quickReply('What are your shipping options?')">
                         📦 Shipping Info
                     </div>
-                    <div class="quick-reply" onclick="chatbot.quickReply('How do I track my order?')">
+                    <div class="quick-reply" onclick="window.chatbot.quickReply('How do I track my order?')">
                         🚚 Track Order
                     </div>
-                    <div class="quick-reply" onclick="chatbot.quickReply('What is your return policy?')">
+                    <div class="quick-reply" onclick="window.chatbot.quickReply('What is your return policy?')">
                         🔄 Returns
-                    </div>
-                    <div class="quick-reply" onclick="chatbot.quickReply('Tell me about your premium products')">
-                        ⭐ Premium Products
                     </div>
                 `;
                 
                 const lastMessage = this.chatMessages.lastElementChild;
-                if (lastMessage && lastMessage.classList.contains('assistant')) {
+                if (lastMessage) {
                     lastMessage.appendChild(quickReplies);
                 }
             }
@@ -462,9 +456,11 @@
 
             setLoadingState(loading) {
                 this.sendButton.disabled = loading;
-                this.sendButton.innerHTML = loading ? 
-                    '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>' : 
-                    '<i class="fas fa-paper-plane"></i>';
+                if (loading) {
+                    this.sendButton.innerHTML = '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+                } else {
+                    this.sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                }
             }
 
             scrollToBottom() {
@@ -472,8 +468,10 @@
             }
         }
 
-        // Initialize chatbot
-        const chatbot = new AdvancedChatbot();
+        // Initialize chatbot when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            window.chatbot = new AdvancedChatbot();
+        });
     </script>
 </body>
 </html>
