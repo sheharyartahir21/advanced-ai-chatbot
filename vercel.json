@@ -11,8 +11,5 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "env": {
-    "VITE_OPENROUTER_API_KEY": "@openrouter_api_key"
-  }
+  ]
 }
